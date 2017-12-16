@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zx.dao.ClaDao">
+	
+	<resultMap type="cla" id="claMap">
+		<id property="claId" column="cla_id"/> 
+		<result property="claName" column="cla_name"/>
+		<collection property="stuList" ofType="stu">
+			<id property="stuId" column="stu_id"/>
+			<result property="stuName" column="stu_Name"/>
+		</collection>
+		
+	</resultMap>
+	
+	<!-- 查询的的单个班级 -->
+	<select id="query" parameterType="String" resultMap="claMap">
+		select 
+			c.*,
+			s.*
+		from
+			cla c
+		left join 
+			stu s
+		on 
+			s.cla_id = c.cla_id
+		where 
+			c.cla_id = #{claId}
+	</select>
+	
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="cla">
+		update 
+			cla
+		set 
+			cla_name = #{claName}
+		where 
+			cla_id = #{claId}
+	</update>
+	
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="String">
+		delete from
+			cla
+		where 
+			cla_id = #{claId}
+	</delete>
+	
+	<!-- 增加 -->
+	<insert id="add" parameterType="cla">
+		insert into 
+			cla
+		values(#{claId},#{claName})
+	</insert>
+	
+	<!-- 分页查询 -->
+	<select id="queryPage" resultMap="claMap">
+		<![CDATA[
+			select 
+				s1.*
+			from 
+				(select 
+					rownum num,
+					s1.*
+				from 
+					(select 
+						*
+					from 
+						cla
+					order by
+						cla_id desc)s1)s2
+			where 
+				num <=#{beginRecord} and
+				num > #{endRecord}
+		]]>
+	</select>
+</mapper>
